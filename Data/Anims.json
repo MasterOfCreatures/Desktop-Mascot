@@ -1,7 +1,7 @@
 {
     "FrameLength": 1.1,
     "Idle": [
-      "idle_1.gif"
+	  "cutethulu_trans_idle.gif"
     ],
     "Carry_left": [
       "carry_left.gif"

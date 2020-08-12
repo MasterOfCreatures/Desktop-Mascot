@@ -31,7 +31,7 @@ namespace Desktop_Actor
             KeyPreview = true;  // Prioritize parent key press over child.
             BackColor = Color.LimeGreen;
             TransparencyKey = Color.LimeGreen;
-            ShowInTaskbar = false;
+            ShowInTaskbar = true;
             WindowState = FormWindowState.Maximized;
             FormBorderStyle = FormBorderStyle.None;
 
@@ -49,7 +49,10 @@ namespace Desktop_Actor
 
             // Render actor.
             var gfx = eventArgs.Graphics;
-            Animator.RenderActorFrame(gfx);
+            //old function
+            //Animator.RenderActorFrame(gfx);
+            //new function supports gif animation:
+            Animator.renderTargetAnimation(gfx);
             gfx.ResetTransform();
 
             // Update movement position relative to fps.

@@ -1,5 +1,10 @@
-[![N|Solid](https://i.imgur.com/gSg0JVk.png)](https://twitter.com/PhylacteryLost)
-Download a [Copy!](https://drive.google.com/open?id=1dmeJtw2hUEC9tUNvFVBSc-A5Df4_tUV7)
+Forked : https://github.com/TCPHijinks/Desktop-Mascot
+Thx btw great work
+
+# Changes to this repo
+- Gif animations are played while idle etc
+- Added a cthulhu gif to data and linked in animations json for testing (https://giphy.com/gifs/cthulhu-lovecraft-lovecraftian-5k01Xbfhom6zRfgYEN)
+- manipulated gravitation (because, why not)
 
 # What does it do?
 It's simple software that gives you a desktop buddy to play with and enjoy! Upon completion it will also include sound effects. All of which in addition to the animations will be easily customizable.

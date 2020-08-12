@@ -2,9 +2,11 @@
 using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Windows.Forms;
 using Newtonsoft.Json;
+
 
 namespace Desktop_Actor
 {
@@ -12,6 +14,7 @@ namespace Desktop_Actor
     {
         private GameObject gameObject;
         private Animations anims;
+        private int currentGifFrame = 0;
 
         public Animator(GameObject gameObject)
         {
@@ -98,7 +101,7 @@ namespace Desktop_Actor
         /// <param name="moveDistPerSecond">Allowed fall distance per second.</param>
         public void Gravity(int moveDistPerSecond)
         {
-            gameObject.Position.Y += moveDistPerSecond;
+            gameObject.Position.Y += (int)Math.Floor(moveDistPerSecond*0.2);
         }
 
         /// <summary>
@@ -154,7 +157,7 @@ namespace Desktop_Actor
         {
             // Get distance from positions before and after movement during this update.
             var distance = new Point(prevPosition.X - gameObject.Position.X, prevPosition.Y - gameObject.Position.X);
-            var clampSpeedAmount = (int)(moveDistPerSecond * .32f); // Amount to reduce speed by.
+            var clampSpeedAmount = (int)((moveDistPerSecond*0.4) * .32f); // Amount to reduce speed by.
 
             if (distance.X <= 0 || distance.Y <= 0) return;
             // Apply clamp to X axis.
@@ -182,7 +185,38 @@ namespace Desktop_Actor
 
             gfx.DrawImage(img, gameObject.Position.X, gameObject.Position.Y);
         }
+         //added this function for getting the exact frame from gif
+        public void renderTargetAnimation(Graphics gfx) {
+            string path = Directory.GetCurrentDirectory() + "\\Data\\Frames\\" + GetAnimState();
+            var inImg = FromFileImage(path);
+            //Get frames  
+            var dimension = new FrameDimension(inImg.FrameDimensionsList[0]);
+            int frameCount = inImg.GetFrameCount(dimension);
+            Image img = null;
+            int index = 0;
+            int duration = 0;
+            if(currentGifFrame >= frameCount)
+            {
+                currentGifFrame = 0;
+            }
 
+            inImg.SelectActiveFrame(dimension, currentGifFrame);
+            var frame = inImg.Clone() as Image;
+            img = frame;
+            currentGifFrame++;
+           
+            gameObject.MyDimensions.Width = img.Width;
+            gameObject.MyDimensions.Height = img.Height;
+
+            gfx.SmoothingMode = SmoothingMode.AntiAlias;
+            gfx.CompositingQuality = CompositingQuality.HighQuality;
+
+            
+            gfx.DrawImage(img, gameObject.Position.X, gameObject.Position.Y);
+
+        }
+        //the currentGifFrame int keeps track of current frame,
+        //TODO: make boolean for move up down etc and keep track for frame so animation plays without glitch
         private string GetAnimState()
         {
             string[] animFrames = anims.Idle;
@@ -191,19 +225,23 @@ namespace Desktop_Actor
             if (velocity.Y < 0) // UP
             {
                 animFrames = anims.Idle;
+                //currentGifFrame = 0;
             }
             else if (velocity.Y > 0) // Down.
             {
                 animFrames = anims.Air_vertical;
+                currentGifFrame = 0;
             }
 
             if (velocity.X < 0) // Left.
             {
                 animFrames = anims.Carry_left;
+                currentGifFrame = 0;
             }
             else if (velocity.X > 0) // Right.
             {
                 animFrames = anims.Carry_right;
+                currentGifFrame = 0;
             }
 
             return animFrames[0];
