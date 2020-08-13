@@ -5,6 +5,8 @@ Thx btw great work
 - Gif animations are played while idle etc
 - Added a cthulhu gif to data and linked in animations json for testing (https://giphy.com/gifs/cthulhu-lovecraft-lovecraftian-5k01Xbfhom6zRfgYEN)
 - manipulated gravitation (because, why not)
+- Added Contex menu with a nice Robot icon to reset buddy, enter and exit console, and exit application(https://pixabay.com/vectors/robot-icon-flat-flat-design-2192617/)
+- Supports Multiple Screens/Monitors now (has some bugs caused by resolution calculations)
 
 # What does it do?
 It's simple software that gives you a desktop buddy to play with and enjoy! Upon completion it will also include sound effects. All of which in addition to the animations will be easily customizable.
