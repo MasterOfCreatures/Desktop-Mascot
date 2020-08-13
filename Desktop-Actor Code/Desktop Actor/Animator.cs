@@ -15,6 +15,7 @@ namespace Desktop_Actor
         private GameObject gameObject;
         private Animations anims;
         private int currentGifFrame = 0;
+        private String currentAnimation = "";
 
         public Animator(GameObject gameObject)
         {
@@ -91,8 +92,9 @@ namespace Desktop_Actor
         /// </summary>
         private void CursorDragActor()
         {
-            gameObject.Position.X = (int)(Cursor.Position.X - (gameObject.MyDimensions.Width / 2));
-            gameObject.Position.Y = (int)(Cursor.Position.Y - (gameObject.MyDimensions.Height / 2));
+            //adding Screenwidth which cursor is pointing at (because cursor changes point at screenchange to 0,0 ...bad windows really really bad)
+            gameObject.Position.X = (int)((Screen.FromPoint(Cursor.Position).Bounds.Width+Cursor.Position.X) - (gameObject.MyDimensions.Width / 2));
+            gameObject.Position.Y = (int)((Cursor.Position.Y) - (gameObject.MyDimensions.Height / 2));
         }
 
         /// <summary>
@@ -208,15 +210,15 @@ namespace Desktop_Actor
             gameObject.MyDimensions.Width = img.Width;
             gameObject.MyDimensions.Height = img.Height;
 
-            gfx.SmoothingMode = SmoothingMode.AntiAlias;
-            gfx.CompositingQuality = CompositingQuality.HighQuality;
+            //gfx.SmoothingMode = SmoothingMode.AntiAlias;
+            //gfx.CompositingQuality = CompositingQuality.HighQuality;
 
             
             gfx.DrawImage(img, gameObject.Position.X, gameObject.Position.Y);
 
         }
-        //the currentGifFrame int keeps track of current frame,
-        //TODO: make boolean for move up down etc and keep track for frame so animation plays without glitch
+        //the currentGifFrame int keeps track of current frame
+        //carefull the inner ifs help to make the animation more fluently when moving obj
         private string GetAnimState()
         {
             string[] animFrames = anims.Idle;
@@ -224,24 +226,47 @@ namespace Desktop_Actor
 
             if (velocity.Y < 0) // UP
             {
+                if (!currentAnimation.Contains("idle")) //thats bad i know, but it works
+                {
+                    Console.WriteLine("SET_CURRENTANIM::IDLE");
+                    currentAnimation = "idle";
+                    currentGifFrame = 0;
+                }
                 animFrames = anims.Idle;
-                //currentGifFrame = 0;
             }
             else if (velocity.Y > 0) // Down.
             {
+                if (!currentAnimation.Contains("air_vertical"))
+                {
+                    Console.WriteLine("SET_CURRENTANIM::AIR_VERTICAL");
+                    currentAnimation = "air_vertical";
+                    currentGifFrame = 0;
+                }
                 animFrames = anims.Air_vertical;
-                currentGifFrame = 0;
+                //currentGifFrame = 0;
             }
 
             if (velocity.X < 0) // Left.
             {
+                if (!currentAnimation.Contains("left"))
+                {
+                    Console.WriteLine("SET_CURRENTANIM::CARRY_LEFT");
+                    currentAnimation = "left";
+                    currentGifFrame = 0;
+                }
                 animFrames = anims.Carry_left;
-                currentGifFrame = 0;
+                //currentGifFrame = 0;
             }
             else if (velocity.X > 0) // Right.
             {
+                if (!currentAnimation.Contains("right"))
+                {
+                    Console.WriteLine("SET_CURRENTANIM::CARRY_RIGHT");
+                    currentAnimation = "right";
+                    currentGifFrame = 0;
+                }
                 animFrames = anims.Carry_right;
-                currentGifFrame = 0;
+                //currentGifFrame = 0;
             }
 
             return animFrames[0];

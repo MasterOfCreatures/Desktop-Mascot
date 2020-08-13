@@ -10,10 +10,14 @@ namespace Desktop_Actor
 {
     public class GameObject
     {
-        private readonly Rectangle _playArea;
+        private Rectangle _playArea;
         public Point Position;
         public Dimensions MyDimensions;
         public bool CursorDragging { private set; get; }
+        public int screenLeft = SystemInformation.VirtualScreen.Left;
+        public int screenTop = SystemInformation.VirtualScreen.Top;
+        public int screenWidth = SystemInformation.VirtualScreen.Width;
+        public int screenHeight = SystemInformation.VirtualScreen.Height;
 
         public GameObject(Control form, Rectangle playAreaBoundary)
         {
@@ -26,9 +30,18 @@ namespace Desktop_Actor
             form.MouseDown += MouseClick;
             form.MouseUp += MouseUp;
 
+
+            /*int screenLeft = SystemInformation.VirtualScreen.Left;
+            int screenTop = SystemInformation.VirtualScreen.Top;
+            int screenWidth = SystemInformation.VirtualScreen.Width;
+            int screenHeight = SystemInformation.VirtualScreen.Height;
+            */
             // Starting position.
-            MyDimensions.Width = form.Width / 2;
-            MyDimensions.Height = form.Height / 3;
+           MyDimensions.Width = form.Width / 2;
+           MyDimensions.Height = form.Height / 3;
+
+            Position.X = screenWidth / 2;
+            Position.Y = screenHeight / 3;
         }
 
         /// <summary>
@@ -40,6 +53,7 @@ namespace Desktop_Actor
             if (Position.Y < _playArea.Y)
             {
                 Position.Y = _playArea.Y;
+                Console.WriteLine("BUMP_TOP");
             }
             // If bottom of GameObject is lower than bottom of the boundary.
             else if ((Position.Y + MyDimensions.Height) > (_playArea.Y + _playArea.Height))
@@ -48,15 +62,32 @@ namespace Desktop_Actor
             }
 
             // If left of GameObject is outside of boundary's left side.
-            if (Position.X < _playArea.X)
+            //does not work correctly anymore, is caused by different resolution settings between multiple screens but its not critical
+            if (Position.X + MyDimensions.Width < _playArea.X)
             {
-                Position.X = _playArea.X;
+                //Position.X = _playArea.X + (MyDimensions.Width+1);
+                Position.X = screenLeft + (MyDimensions.Width+1);
+                Console.WriteLine("BUMP_LEFT");
+                //  Position.X = screenLeft;
             }
+            /*if (Position.X < screenLeft) {
+                Position.X = screenLeft + MyDimensions.Width;
+            }*/
             // If right of GameObject is outside of boundary's right side.
-            else if ((Position.X + MyDimensions.Width) > (_playArea.X + _playArea.Width))
+            /*else if (Position.X > screenWidth)
             {
-                Position.X = (_playArea.X + _playArea.Width) - MyDimensions.Width;
+                Position.X = screenWidth - MyDimensions.Width;
+            }*/
+            else if ((Position.X - MyDimensions.Width) > (_playArea.X + _playArea.Width))
+            {
+                Position.X = (_playArea.X + _playArea.Width);
+                Console.WriteLine("BUMP_RIGHT");
             }
+        }
+        //this function is important because i managed to create some bugs along the journey
+        public void resetActor() {
+            Position.X = screenWidth / 2;
+            Position.Y = screenHeight / 3;
         }
 
         #region Event Methods
