@@ -1,9 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 
@@ -16,8 +16,10 @@ namespace Desktop_Actor
         private Animations anims;
         private int currentGifFrame = 0;
         private String currentAnimation = "";
+        public Double resizeFactor { get; set; } = 1.0 ;
+        public Boolean gravitation { get; set; } = true;
 
-        public Animator(GameObject gameObject)
+    public Animator(GameObject gameObject)
         {
             this.gameObject = gameObject;
 
@@ -66,25 +68,32 @@ namespace Desktop_Actor
 
             // Follow cursor or apply gravity.
             if (gameObject.CursorDragging)
+            {
                 CursorDragActor();
+            }
             else
-                Gravity(moveDistPerSecond);
+            {
+                if (gravitation)
+                {
+                    Gravity(moveDistPerSecond);
+                }
 
-            gameObject.KeepInsidePlayArea(); // Keep gameobject inside boundaries.
+                gameObject.KeepInsidePlayArea(); // Keep gameobject inside boundaries.
 
-            // Update cur Point and calculate dist moved from last pos.
-            prevPos[n] = gameObject.Position;
-            curPosDif[n].X = prevPos[n].X - prevPos[d].X;
-            curPosDif[n].Y = prevPos[n].Y - prevPos[d].Y;
+                // Update cur Point and calculate dist moved from last pos.
+                prevPos[n] = gameObject.Position;
+                curPosDif[n].X = prevPos[n].X - prevPos[d].X;
+                curPosDif[n].Y = prevPos[n].Y - prevPos[d].Y;
 
-            // Increment so that curPos overflows at array end.
-            n = OverflowInt(n);
-            d = OverflowInt(d);
+                // Increment so that curPos overflows at array end.
+                n = OverflowInt(n);
+                d = OverflowInt(d);
 
-            // Calculate avg of total differences between movement in array.
-            // Then move gameobject based on that to simulate velocity/physics.
-            velocity = SumAvg(curPosDif);
-            PhysicsMovement(moveDistPerSecond);
+                // Calculate avg of total differences between movement in array.
+                // Then move gameobject based on that to simulate velocity/physics.
+                velocity = SumAvg(curPosDif);
+                PhysicsMovement(moveDistPerSecond);
+            }
         }
 
         /// <summary>
@@ -92,9 +101,24 @@ namespace Desktop_Actor
         /// </summary>
         private void CursorDragActor()
         {
+            int screenDifference=0;
+            int[] screenBoundWith = new int[Screen.AllScreens.Length];
+            for (int s = 0; s < Screen.AllScreens.Length; s++) {
+                screenBoundWith[s] = Screen.AllScreens[s].Bounds.Width;
+            }
+            //Console.WriteLine("Screen Length: " + Screen.AllScreens.Length);
+            if (Screen.AllScreens.Length >= 2) {
+                screenDifference = screenBoundWith.Max() - screenBoundWith.Min();
+            }
             //adding Screenwidth which cursor is pointing at (because cursor changes point at screenchange to 0,0 ...bad windows really really bad)
-            gameObject.Position.X = (int)((Screen.FromPoint(Cursor.Position).Bounds.Width+Cursor.Position.X) - (gameObject.MyDimensions.Width / 2));
+            gameObject.Position.X = (int)(((Screen.AllScreens[0].Bounds.Width-screenDifference)+Cursor.Position.X) - (gameObject.MyDimensions.Width / 2));
             gameObject.Position.Y = (int)((Cursor.Position.Y) - (gameObject.MyDimensions.Height / 2));
+            //Console.WriteLine("Cursor X: " + Cursor.Position.X);
+            //Console.WriteLine("Cursor Calculated: " + (Screen.FromPoint(Cursor.Position).Bounds.Width + Cursor.Position.X));
+            //Console.WriteLine("Cursor Calculated: " + (Screen.AllScreens[0].Bounds.Width + Cursor.Position.X));
+            //Console.WriteLine("ScreenDiff: " + (Screen.AllScreens[0].Bounds.Width - Screen.AllScreens[1].Bounds.Width));
+            //Console.WriteLine("Calculated ScreenDiff: " + screenDifference);
+            //Console.WriteLine("Cursor Y: " + Cursor.Position.Y);
         }
 
         /// <summary>
@@ -187,7 +211,40 @@ namespace Desktop_Actor
 
             gfx.DrawImage(img, gameObject.Position.X, gameObject.Position.Y);
         }
-         //added this function for getting the exact frame from gif
+        /// <summary>
+        /// Resize the image to the specified width and height.
+        /// </summary>
+        /// <param name="image">The image to resize.</param>
+        /// <param name="width">The width to resize to.</param>
+        /// <param name="height">The height to resize to.</param>
+        /// <returns>The resized image.</returns>
+        public static Bitmap ResizeImage(Image image, double factor)
+        {
+            var destRect = new Rectangle(0, 0, (int)Math.Floor(image.Width*factor),(int)Math.Floor(image.Height*factor));
+            var destImage = new Bitmap((int)Math.Floor(image.Width * factor), (int)Math.Floor(image.Height * factor));
+
+            destImage.SetResolution(image.HorizontalResolution, image.VerticalResolution);
+
+            using (var graphics = Graphics.FromImage(destImage))
+            {
+                graphics.CompositingMode = CompositingMode.SourceCopy;
+                graphics.CompositingQuality = CompositingQuality.HighQuality;
+                graphics.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                graphics.SmoothingMode = SmoothingMode.HighQuality;
+                graphics.PixelOffsetMode = PixelOffsetMode.HighQuality;
+
+                using (var wrapMode = new ImageAttributes())
+                {
+                    wrapMode.SetWrapMode(WrapMode.TileFlipXY);
+                    graphics.DrawImage(image, destRect, 0, 0, image.Width, image.Height, GraphicsUnit.Pixel, wrapMode);
+                }
+            }
+
+            return destImage;
+        }
+
+
+        //added this function for getting the exact frame from gif
         public void renderTargetAnimation(Graphics gfx) {
             string path = Directory.GetCurrentDirectory() + "\\Data\\Frames\\" + GetAnimState();
             var inImg = FromFileImage(path);
@@ -204,7 +261,7 @@ namespace Desktop_Actor
 
             inImg.SelectActiveFrame(dimension, currentGifFrame);
             var frame = inImg.Clone() as Image;
-            img = frame;
+            img = ResizeImage(frame, resizeFactor);
             currentGifFrame++;
            
             gameObject.MyDimensions.Width = img.Width;
@@ -213,7 +270,6 @@ namespace Desktop_Actor
             //gfx.SmoothingMode = SmoothingMode.AntiAlias;
             //gfx.CompositingQuality = CompositingQuality.HighQuality;
 
-            
             gfx.DrawImage(img, gameObject.Position.X, gameObject.Position.Y);
 
         }

@@ -18,6 +18,7 @@ namespace Desktop_Actor
         public int screenTop = SystemInformation.VirtualScreen.Top;
         public int screenWidth = SystemInformation.VirtualScreen.Width;
         public int screenHeight = SystemInformation.VirtualScreen.Height;
+        public Boolean gravitation { get; set; } = true;
 
         public GameObject(Control form, Rectangle playAreaBoundary)
         {
@@ -42,6 +43,10 @@ namespace Desktop_Actor
 
             Position.X = screenWidth / 2;
             Position.Y = screenHeight / 3;
+            Console.WriteLine("screenTop: " + screenTop);
+            Console.WriteLine("screenLeft: " + screenLeft);
+            Console.WriteLine("screenWidth: " + screenWidth);
+            Console.WriteLine("screenHeight: " + screenHeight);
         }
 
         /// <summary>
@@ -50,7 +55,7 @@ namespace Desktop_Actor
         public void KeepInsidePlayArea()
         {
             // If top of GameObject is higher than top of the boundary.
-            if (Position.Y < _playArea.Y)
+            if (Position.Y < _playArea.Y && !gravitation)
             {
                 Position.Y = _playArea.Y;
                 Console.WriteLine("BUMP_TOP");
@@ -63,10 +68,10 @@ namespace Desktop_Actor
 
             // If left of GameObject is outside of boundary's left side.
             //does not work correctly anymore, is caused by different resolution settings between multiple screens but its not critical
-            if (Position.X + MyDimensions.Width < _playArea.X)
+            if (Position.X + MyDimensions.Width  <=0 )
             {
                 //Position.X = _playArea.X + (MyDimensions.Width+1);
-                Position.X = screenLeft + (MyDimensions.Width+1);
+                Position.X = 0 + (MyDimensions.Width+1);
                 Console.WriteLine("BUMP_LEFT");
                 //  Position.X = screenLeft;
             }
@@ -78,9 +83,11 @@ namespace Desktop_Actor
             {
                 Position.X = screenWidth - MyDimensions.Width;
             }*/
-            else if ((Position.X - MyDimensions.Width) > (_playArea.X + _playArea.Width))
+            //else if ((Position.X) > (_playArea.X + _playArea.Width))
+            else if ((Position.X) > (screenWidth))
             {
-                Position.X = (_playArea.X + _playArea.Width);
+                //Position.X = (_playArea.X + _playArea.Width);
+                Position.X = (screenWidth - (MyDimensions.Width/2));
                 Console.WriteLine("BUMP_RIGHT");
             }
         }

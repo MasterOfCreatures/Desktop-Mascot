@@ -7,6 +7,9 @@ Thx btw great work
 - manipulated gravitation (because, why not)
 - Added Contex menu with a nice Robot icon to reset buddy, enter and exit console, and exit application(https://pixabay.com/vectors/robot-icon-flat-flat-design-2192617/)
 - Supports Multiple Screens/Monitors now (has some bugs caused by resolution calculations)
+- Added Resize options in Contextmenu
+- Added Gravitational manipulation in Contextmenu
+
 
 # What does it do?
 It's simple software that gives you a desktop buddy to play with and enjoy! Upon completion it will also include sound effects. All of which in addition to the animations will be easily customizable.

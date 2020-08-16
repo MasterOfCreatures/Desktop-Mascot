@@ -22,7 +22,7 @@ namespace Desktop_Actor
         private Rectangle gameObjectPlayArea;
         private System.Windows.Forms.NotifyIcon notify;
         private System.Windows.Forms.ContextMenu contextMenu;
-        private System.Windows.Forms.MenuItem menuItemClose, menuItemConsole, menuResetActor;
+        private System.Windows.Forms.MenuItem menuItemClose, menuItemConsole, menuResetActor, menuGravitationBuddy , menuBiggerBuddy, menuSmallerBuddy, menuResetSize;
         private bool consoleEnabled = false;
 
         public MainForm()
@@ -54,16 +54,32 @@ namespace Desktop_Actor
             this.menuItemClose = new MenuItem();
             this.menuItemConsole = new MenuItem();
             this.menuResetActor = new MenuItem();
+            this.menuBiggerBuddy = new MenuItem();
+            this.menuSmallerBuddy = new MenuItem();
+            this.menuResetSize = new MenuItem();
+            this.menuGravitationBuddy = new MenuItem();
 
-            this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.menuResetActor,this.menuItemConsole,this.menuItemClose });
+            this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.menuResetActor,this.menuBiggerBuddy, this.menuSmallerBuddy,this.menuResetSize,this.menuGravitationBuddy,this.menuItemConsole,this.menuItemClose });
 
             this.menuResetActor.Index = 0;
-            this.menuResetActor.Text = "RESET BUDDY";
-            this.menuResetActor.Click += new System.EventHandler(this.menuResetActor_Click);
-            this.menuItemConsole.Index = 1;
+            this.menuResetActor.Text = "RESET BUDDY POSITION";
+            this.menuResetActor.Click += new System.EventHandler(this.menuResetPosition_Click);
+            this.menuBiggerBuddy.Index = 1;
+            this.menuBiggerBuddy.Text = "MAKE BUDDY BIGGER";
+            this.menuBiggerBuddy.Click += new System.EventHandler(this.menuBiggerBuddy_Click);
+            this.menuSmallerBuddy.Index = 2;
+            this.menuSmallerBuddy.Text = "MAKE BUDDY SMALLER";
+            this.menuSmallerBuddy.Click += new System.EventHandler(this.menuSmallerBuddy_Click);
+            this.menuResetSize.Index = 3;
+            this.menuResetSize.Text = "RESET BUDDY SIZE";
+            this.menuResetSize.Click += new System.EventHandler(this.menuResetSize_Click);
+            this.menuGravitationBuddy.Index = 4;
+            this.menuGravitationBuddy.Text = "GRAVITATION OFF";
+            this.menuGravitationBuddy.Click += new System.EventHandler(this.menuGravitation_Click);
+            this.menuItemConsole.Index = 5;
             this.menuItemConsole.Text = "ENABLE/DISABLE CONSOLE";
             this.menuItemConsole.Click += new System.EventHandler(this.menuItemConsole_Click);
-            this.menuItemClose.Index = 2;
+            this.menuItemClose.Index = 6;
             this.menuItemClose.Text = "EXIT";
             this.menuItemClose.Click += new System.EventHandler(this.menuItemClose_Click);
             
@@ -122,18 +138,20 @@ namespace Desktop_Actor
             //change Console output
             if (consoleEnabled)
             {
+                this.menuItemConsole.Text = "ENABLE CONSOLE";
                 consoleEnabled = false;
                 var handle = GetConsoleWindow();
                 ShowWindow(handle, SW_HIDE);
             }
             else {
+                this.menuItemConsole.Text="DISABLE CONSOLE";
                 consoleEnabled = true;
                 var handle = GetConsoleWindow();
                 ShowWindow(handle, SW_SHOW);
             }
         }
 
-        private void menuResetActor_Click(object Sender, EventArgs e) {
+        private void menuResetPosition_Click(object Sender, EventArgs e) {
             //do this multiple time so the actor will stay (does not work btw but creates funny effects)
             actor.resetActor();
             actor.resetActor();
@@ -146,5 +164,44 @@ namespace Desktop_Actor
             actor.resetActor();
             actor.resetActor();
         }
+
+        private void menuBiggerBuddy_Click(object Sender, EventArgs e) {
+            Animator.resizeFactor = Animator.resizeFactor + 0.1;
+            Console.WriteLine("BIGGER BUDDY: "+Animator.resizeFactor);
+        }
+        private void menuSmallerBuddy_Click(object Sender, EventArgs e)
+        {
+            if (Animator.resizeFactor <= 0.11) {
+                //Animator.resizeFactor = Animator.resizeFactor - 0.01;
+                Console.WriteLine("CANT MAKE SMALLER");
+            }
+            else
+            {
+                Animator.resizeFactor = Animator.resizeFactor - 0.1;
+                Console.WriteLine("SMALLER BUDDY: "+Animator.resizeFactor);
+            }
+        }
+        private void menuResetSize_Click(Object Sender, EventArgs e) {
+            Animator.resizeFactor = 1.0;
+            Console.WriteLine("BUDDY SIZE: "+Animator.resizeFactor);
+        }
+
+        private void menuGravitation_Click(Object Sender, EventArgs e) {
+
+            if (Animator.gravitation)
+            {
+                menuGravitationBuddy.Text = "ENABLE GRAVITATION";
+                actor.gravitation = false;
+                Animator.gravitation = false;
+            }
+            else {
+                menuGravitationBuddy.Text = "DISABLE GRAVITATION";
+                actor.gravitation = true;
+                Animator.gravitation = true;
+            }
+
+        }
+
     }
+
 }
