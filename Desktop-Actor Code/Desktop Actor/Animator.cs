@@ -18,6 +18,7 @@ namespace Desktop_Actor
         private String currentAnimation = "";
         public Double resizeFactor { get; set; } = 1.0 ;
         public Boolean gravitation { get; set; } = true;
+        public Double gravitationFactor { get; set; } = 1.0;
 
     public Animator(GameObject gameObject)
         {
@@ -127,7 +128,7 @@ namespace Desktop_Actor
         /// <param name="moveDistPerSecond">Allowed fall distance per second.</param>
         public void Gravity(int moveDistPerSecond)
         {
-            gameObject.Position.Y += (int)Math.Floor(moveDistPerSecond*0.2);
+            gameObject.Position.Y += (int)Math.Floor((moveDistPerSecond*0.2)*gravitationFactor);
         }
 
         /// <summary>

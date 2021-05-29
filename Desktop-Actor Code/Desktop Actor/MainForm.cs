@@ -22,7 +22,7 @@ namespace Desktop_Actor
         private Rectangle gameObjectPlayArea;
         private System.Windows.Forms.NotifyIcon notify;
         private System.Windows.Forms.ContextMenu contextMenu;
-        private System.Windows.Forms.MenuItem menuItemClose, menuItemConsole, menuResetActor, menuGravitationBuddy , menuBiggerBuddy, menuSmallerBuddy, menuResetSize;
+        private System.Windows.Forms.MenuItem menuItemClose, menuItemConsole, menuResetActor, menuGravitationBuddy, menuMinusGravitation, menuPlusGravitation, menuBiggerBuddy, menuSmallerBuddy, menuResetSize;
         private bool consoleEnabled = false;
 
         public MainForm()
@@ -58,8 +58,10 @@ namespace Desktop_Actor
             this.menuSmallerBuddy = new MenuItem();
             this.menuResetSize = new MenuItem();
             this.menuGravitationBuddy = new MenuItem();
+            this.menuMinusGravitation = new MenuItem();
+            this.menuPlusGravitation = new MenuItem();
 
-            this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.menuResetActor,this.menuBiggerBuddy, this.menuSmallerBuddy,this.menuResetSize,this.menuGravitationBuddy,this.menuItemConsole,this.menuItemClose });
+            this.contextMenu.MenuItems.AddRange(new System.Windows.Forms.MenuItem[] { this.menuResetActor,this.menuBiggerBuddy, this.menuSmallerBuddy,this.menuResetSize,this.menuGravitationBuddy,this.menuPlusGravitation,this.menuMinusGravitation,this.menuItemConsole,this.menuItemClose });
 
             this.menuResetActor.Index = 0;
             this.menuResetActor.Text = "RESET BUDDY POSITION";
@@ -76,10 +78,16 @@ namespace Desktop_Actor
             this.menuGravitationBuddy.Index = 4;
             this.menuGravitationBuddy.Text = "GRAVITATION OFF";
             this.menuGravitationBuddy.Click += new System.EventHandler(this.menuGravitation_Click);
-            this.menuItemConsole.Index = 5;
+            this.menuPlusGravitation.Index = 5;
+            this.menuPlusGravitation.Text = "+++ GRAVITATION";
+            this.menuPlusGravitation.Click += new System.EventHandler(this.menuPlusGravitation_Click);
+            this.menuMinusGravitation.Index = 6;
+            this.menuMinusGravitation.Text = "--- GRAVITATION";
+            this.menuMinusGravitation.Click += new System.EventHandler(this.menuMinusGravitation_Click);
+            this.menuItemConsole.Index = 7;
             this.menuItemConsole.Text = "ENABLE/DISABLE CONSOLE";
             this.menuItemConsole.Click += new System.EventHandler(this.menuItemConsole_Click);
-            this.menuItemClose.Index = 6;
+            this.menuItemClose.Index = 8;
             this.menuItemClose.Text = "EXIT";
             this.menuItemClose.Click += new System.EventHandler(this.menuItemClose_Click);
             
@@ -200,6 +208,33 @@ namespace Desktop_Actor
                 Animator.gravitation = true;
             }
 
+        }
+        private void menuPlusGravitation_Click(Object Sender, EventArgs e)
+        {
+            if (Animator.gravitationFactor <= 3)
+            {
+                Animator.gravitationFactor = Animator.gravitationFactor + 0.1;
+                Console.WriteLine("Gravitation Factor:" + Animator.gravitationFactor);
+            }
+            else {
+                Animator.gravitationFactor = 1.0;
+                Console.WriteLine("Gravitation Factor Reached Max 3.0");
+                Console.WriteLine("Gravitation Factor:" + Animator.gravitationFactor);
+            }
+        }
+
+        private void menuMinusGravitation_Click(Object Sender, EventArgs e) {
+            if (Animator.gravitationFactor >= -3)
+            {
+                Animator.gravitationFactor = Animator.gravitationFactor - 0.1;
+                Console.WriteLine("Gravitation Factor:" + Animator.gravitationFactor);
+            }
+            else
+            {
+                Animator.gravitationFactor = 1.0;
+                Console.WriteLine("Gravitation Factor Reached Min -3.0");
+                Console.WriteLine("Gravitation Factor:" + Animator.gravitationFactor);
+            }
         }
 
     }
